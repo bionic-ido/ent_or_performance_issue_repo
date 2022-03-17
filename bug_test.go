@@ -103,6 +103,10 @@ func test(t *testing.T, client *ent.Client) {
 	client.User.Delete().ExecX(ctx)
 	client.Admin.Delete().ExecX(ctx)
 
+	// Clean database at the end as well
+	defer client.User.Delete().ExecX(ctx)
+	defer client.Admin.Delete().ExecX(ctx)
+
 	// Do fillDatabase a couple of times to really fill it up, and then only get 100 admins to query on from one of the inserts
 	fmt.Println("Fill up database")
 	i := 0
