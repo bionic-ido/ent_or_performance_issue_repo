@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 
+	"entgo.io/bug/ent/admin"
 	"entgo.io/bug/ent/predicate"
 	"entgo.io/bug/ent/user"
 	"entgo.io/ent/dialect/sql"
@@ -46,9 +47,59 @@ func (uu *UserUpdate) SetName(s string) *UserUpdate {
 	return uu
 }
 
+// SetMemberAdminID sets the "member_admin" edge to the Admin entity by ID.
+func (uu *UserUpdate) SetMemberAdminID(id int) *UserUpdate {
+	uu.mutation.SetMemberAdminID(id)
+	return uu
+}
+
+// SetNillableMemberAdminID sets the "member_admin" edge to the Admin entity by ID if the given value is not nil.
+func (uu *UserUpdate) SetNillableMemberAdminID(id *int) *UserUpdate {
+	if id != nil {
+		uu = uu.SetMemberAdminID(*id)
+	}
+	return uu
+}
+
+// SetMemberAdmin sets the "member_admin" edge to the Admin entity.
+func (uu *UserUpdate) SetMemberAdmin(a *Admin) *UserUpdate {
+	return uu.SetMemberAdminID(a.ID)
+}
+
+// SetLeadAdminID sets the "lead_admin" edge to the Admin entity by ID.
+func (uu *UserUpdate) SetLeadAdminID(id int) *UserUpdate {
+	uu.mutation.SetLeadAdminID(id)
+	return uu
+}
+
+// SetNillableLeadAdminID sets the "lead_admin" edge to the Admin entity by ID if the given value is not nil.
+func (uu *UserUpdate) SetNillableLeadAdminID(id *int) *UserUpdate {
+	if id != nil {
+		uu = uu.SetLeadAdminID(*id)
+	}
+	return uu
+}
+
+// SetLeadAdmin sets the "lead_admin" edge to the Admin entity.
+func (uu *UserUpdate) SetLeadAdmin(a *Admin) *UserUpdate {
+	return uu.SetLeadAdminID(a.ID)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearMemberAdmin clears the "member_admin" edge to the Admin entity.
+func (uu *UserUpdate) ClearMemberAdmin() *UserUpdate {
+	uu.mutation.ClearMemberAdmin()
+	return uu
+}
+
+// ClearLeadAdmin clears the "lead_admin" edge to the Admin entity.
+func (uu *UserUpdate) ClearLeadAdmin() *UserUpdate {
+	uu.mutation.ClearLeadAdmin()
+	return uu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -144,6 +195,76 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldName,
 		})
 	}
+	if uu.mutation.MemberAdminCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.MemberAdminTable,
+			Columns: []string{user.MemberAdminColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: admin.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.MemberAdminIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.MemberAdminTable,
+			Columns: []string{user.MemberAdminColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: admin.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.LeadAdminCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.LeadAdminTable,
+			Columns: []string{user.LeadAdminColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: admin.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.LeadAdminIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.LeadAdminTable,
+			Columns: []string{user.LeadAdminColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: admin.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -182,9 +303,59 @@ func (uuo *UserUpdateOne) SetName(s string) *UserUpdateOne {
 	return uuo
 }
 
+// SetMemberAdminID sets the "member_admin" edge to the Admin entity by ID.
+func (uuo *UserUpdateOne) SetMemberAdminID(id int) *UserUpdateOne {
+	uuo.mutation.SetMemberAdminID(id)
+	return uuo
+}
+
+// SetNillableMemberAdminID sets the "member_admin" edge to the Admin entity by ID if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableMemberAdminID(id *int) *UserUpdateOne {
+	if id != nil {
+		uuo = uuo.SetMemberAdminID(*id)
+	}
+	return uuo
+}
+
+// SetMemberAdmin sets the "member_admin" edge to the Admin entity.
+func (uuo *UserUpdateOne) SetMemberAdmin(a *Admin) *UserUpdateOne {
+	return uuo.SetMemberAdminID(a.ID)
+}
+
+// SetLeadAdminID sets the "lead_admin" edge to the Admin entity by ID.
+func (uuo *UserUpdateOne) SetLeadAdminID(id int) *UserUpdateOne {
+	uuo.mutation.SetLeadAdminID(id)
+	return uuo
+}
+
+// SetNillableLeadAdminID sets the "lead_admin" edge to the Admin entity by ID if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableLeadAdminID(id *int) *UserUpdateOne {
+	if id != nil {
+		uuo = uuo.SetLeadAdminID(*id)
+	}
+	return uuo
+}
+
+// SetLeadAdmin sets the "lead_admin" edge to the Admin entity.
+func (uuo *UserUpdateOne) SetLeadAdmin(a *Admin) *UserUpdateOne {
+	return uuo.SetLeadAdminID(a.ID)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearMemberAdmin clears the "member_admin" edge to the Admin entity.
+func (uuo *UserUpdateOne) ClearMemberAdmin() *UserUpdateOne {
+	uuo.mutation.ClearMemberAdmin()
+	return uuo
+}
+
+// ClearLeadAdmin clears the "lead_admin" edge to the Admin entity.
+func (uuo *UserUpdateOne) ClearLeadAdmin() *UserUpdateOne {
+	uuo.mutation.ClearLeadAdmin()
+	return uuo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -303,6 +474,76 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Value:  value,
 			Column: user.FieldName,
 		})
+	}
+	if uuo.mutation.MemberAdminCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.MemberAdminTable,
+			Columns: []string{user.MemberAdminColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: admin.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.MemberAdminIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.MemberAdminTable,
+			Columns: []string{user.MemberAdminColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: admin.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.LeadAdminCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.LeadAdminTable,
+			Columns: []string{user.LeadAdminColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: admin.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.LeadAdminIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.LeadAdminTable,
+			Columns: []string{user.LeadAdminColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: admin.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

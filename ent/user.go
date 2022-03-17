@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"entgo.io/bug/ent/admin"
 	"entgo.io/bug/ent/user"
 	"entgo.io/ent/dialect/sql"
 )
@@ -19,6 +20,50 @@ type User struct {
 	Age int `json:"age,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges              UserEdges `json:"edges"`
+	admin_team_members *int
+	admin_team_leader  *int
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// MemberAdmin holds the value of the member_admin edge.
+	MemberAdmin *Admin `json:"member_admin,omitempty"`
+	// LeadAdmin holds the value of the lead_admin edge.
+	LeadAdmin *Admin `json:"lead_admin,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// MemberAdminOrErr returns the MemberAdmin value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) MemberAdminOrErr() (*Admin, error) {
+	if e.loadedTypes[0] {
+		if e.MemberAdmin == nil {
+			// The edge member_admin was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: admin.Label}
+		}
+		return e.MemberAdmin, nil
+	}
+	return nil, &NotLoadedError{edge: "member_admin"}
+}
+
+// LeadAdminOrErr returns the LeadAdmin value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e UserEdges) LeadAdminOrErr() (*Admin, error) {
+	if e.loadedTypes[1] {
+		if e.LeadAdmin == nil {
+			// The edge lead_admin was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: admin.Label}
+		}
+		return e.LeadAdmin, nil
+	}
+	return nil, &NotLoadedError{edge: "lead_admin"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -30,6 +75,10 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case user.FieldName:
 			values[i] = new(sql.NullString)
+		case user.ForeignKeys[0]: // admin_team_members
+			values[i] = new(sql.NullInt64)
+		case user.ForeignKeys[1]: // admin_team_leader
+			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type User", columns[i])
 		}
@@ -63,9 +112,33 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				u.Name = value.String
 			}
+		case user.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field admin_team_members", value)
+			} else if value.Valid {
+				u.admin_team_members = new(int)
+				*u.admin_team_members = int(value.Int64)
+			}
+		case user.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field admin_team_leader", value)
+			} else if value.Valid {
+				u.admin_team_leader = new(int)
+				*u.admin_team_leader = int(value.Int64)
+			}
 		}
 	}
 	return nil
+}
+
+// QueryMemberAdmin queries the "member_admin" edge of the User entity.
+func (u *User) QueryMemberAdmin() *AdminQuery {
+	return (&UserClient{config: u.config}).QueryMemberAdmin(u)
+}
+
+// QueryLeadAdmin queries the "lead_admin" edge of the User entity.
+func (u *User) QueryLeadAdmin() *AdminQuery {
+	return (&UserClient{config: u.config}).QueryLeadAdmin(u)
 }
 
 // Update returns a builder for updating this User.

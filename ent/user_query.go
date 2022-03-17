@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/bug/ent/admin"
 	"entgo.io/bug/ent/predicate"
 	"entgo.io/bug/ent/user"
 	"entgo.io/ent/dialect/sql"
@@ -24,6 +25,10 @@ type UserQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.User
+	// eager-loading edges.
+	withMemberAdmin *AdminQuery
+	withLeadAdmin   *AdminQuery
+	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -58,6 +63,50 @@ func (uq *UserQuery) Unique(unique bool) *UserQuery {
 func (uq *UserQuery) Order(o ...OrderFunc) *UserQuery {
 	uq.order = append(uq.order, o...)
 	return uq
+}
+
+// QueryMemberAdmin chains the current query on the "member_admin" edge.
+func (uq *UserQuery) QueryMemberAdmin() *AdminQuery {
+	query := &AdminQuery{config: uq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, user.MemberAdminTable, user.MemberAdminColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryLeadAdmin chains the current query on the "lead_admin" edge.
+func (uq *UserQuery) QueryLeadAdmin() *AdminQuery {
+	query := &AdminQuery{config: uq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, user.LeadAdminTable, user.LeadAdminColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first User entity from the query.
@@ -106,7 +155,7 @@ func (uq *UserQuery) FirstIDX(ctx context.Context) int {
 }
 
 // Only returns a single User entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when exactly one User entity is not found.
+// Returns a *NotSingularError when more than one User entity is found.
 // Returns a *NotFoundError when no User entities are found.
 func (uq *UserQuery) Only(ctx context.Context) (*User, error) {
 	nodes, err := uq.Limit(2).All(ctx)
@@ -133,7 +182,7 @@ func (uq *UserQuery) OnlyX(ctx context.Context) *User {
 }
 
 // OnlyID is like Only, but returns the only User ID in the query.
-// Returns a *NotSingularError when exactly one User ID is not found.
+// Returns a *NotSingularError when more than one User ID is found.
 // Returns a *NotFoundError when no entities are found.
 func (uq *UserQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
@@ -236,15 +285,40 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:     uq.config,
-		limit:      uq.limit,
-		offset:     uq.offset,
-		order:      append([]OrderFunc{}, uq.order...),
-		predicates: append([]predicate.User{}, uq.predicates...),
+		config:          uq.config,
+		limit:           uq.limit,
+		offset:          uq.offset,
+		order:           append([]OrderFunc{}, uq.order...),
+		predicates:      append([]predicate.User{}, uq.predicates...),
+		withMemberAdmin: uq.withMemberAdmin.Clone(),
+		withLeadAdmin:   uq.withLeadAdmin.Clone(),
 		// clone intermediate query.
-		sql:  uq.sql.Clone(),
-		path: uq.path,
+		sql:    uq.sql.Clone(),
+		path:   uq.path,
+		unique: uq.unique,
 	}
+}
+
+// WithMemberAdmin tells the query-builder to eager-load the nodes that are connected to
+// the "member_admin" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithMemberAdmin(opts ...func(*AdminQuery)) *UserQuery {
+	query := &AdminQuery{config: uq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withMemberAdmin = query
+	return uq
+}
+
+// WithLeadAdmin tells the query-builder to eager-load the nodes that are connected to
+// the "lead_admin" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithLeadAdmin(opts ...func(*AdminQuery)) *UserQuery {
+	query := &AdminQuery{config: uq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withLeadAdmin = query
+	return uq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -310,9 +384,20 @@ func (uq *UserQuery) prepareQuery(ctx context.Context) error {
 
 func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 	var (
-		nodes = []*User{}
-		_spec = uq.querySpec()
+		nodes       = []*User{}
+		withFKs     = uq.withFKs
+		_spec       = uq.querySpec()
+		loadedTypes = [2]bool{
+			uq.withMemberAdmin != nil,
+			uq.withLeadAdmin != nil,
+		}
 	)
+	if uq.withMemberAdmin != nil || uq.withLeadAdmin != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, user.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &User{config: uq.config}
 		nodes = append(nodes, node)
@@ -323,6 +408,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, uq.driver, _spec); err != nil {
@@ -331,6 +417,65 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+
+	if query := uq.withMemberAdmin; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*User)
+		for i := range nodes {
+			if nodes[i].admin_team_members == nil {
+				continue
+			}
+			fk := *nodes[i].admin_team_members
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
+		}
+		query.Where(admin.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "admin_team_members" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.MemberAdmin = n
+			}
+		}
+	}
+
+	if query := uq.withLeadAdmin; query != nil {
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*User)
+		for i := range nodes {
+			if nodes[i].admin_team_leader == nil {
+				continue
+			}
+			fk := *nodes[i].admin_team_leader
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
+		}
+		query.Where(admin.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "admin_team_leader" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.LeadAdmin = n
+			}
+		}
+	}
+
 	return nodes, nil
 }
 

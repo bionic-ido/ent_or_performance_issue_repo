@@ -8,23 +8,66 @@ import (
 )
 
 var (
+	// AdminsColumns holds the columns for the "admins" table.
+	AdminsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "age", Type: field.TypeInt},
+		{Name: "name", Type: field.TypeString},
+	}
+	// AdminsTable holds the schema information for the "admins" table.
+	AdminsTable = &schema.Table{
+		Name:       "admins",
+		Columns:    AdminsColumns,
+		PrimaryKey: []*schema.Column{AdminsColumns[0]},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "age", Type: field.TypeInt},
 		{Name: "name", Type: field.TypeString},
+		{Name: "admin_team_members", Type: field.TypeInt, Nullable: true},
+		{Name: "admin_team_leader", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
 		Name:       "users",
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "users_admins_team_members",
+				Columns:    []*schema.Column{UsersColumns[3]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "users_admins_team_leader",
+				Columns:    []*schema.Column{UsersColumns[4]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "user_admin_team_members",
+				Unique:  false,
+				Columns: []*schema.Column{UsersColumns[3]},
+			},
+			{
+				Name:    "user_admin_team_leader",
+				Unique:  false,
+				Columns: []*schema.Column{UsersColumns[4]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AdminsTable,
 		UsersTable,
 	}
 )
 
 func init() {
+	UsersTable.ForeignKeys[0].RefTable = AdminsTable
+	UsersTable.ForeignKeys[1].RefTable = AdminsTable
 }

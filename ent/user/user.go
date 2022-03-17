@@ -11,8 +11,26 @@ const (
 	FieldAge = "age"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// EdgeMemberAdmin holds the string denoting the member_admin edge name in mutations.
+	EdgeMemberAdmin = "member_admin"
+	// EdgeLeadAdmin holds the string denoting the lead_admin edge name in mutations.
+	EdgeLeadAdmin = "lead_admin"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// MemberAdminTable is the table that holds the member_admin relation/edge.
+	MemberAdminTable = "users"
+	// MemberAdminInverseTable is the table name for the Admin entity.
+	// It exists in this package in order to avoid circular dependency with the "admin" package.
+	MemberAdminInverseTable = "admins"
+	// MemberAdminColumn is the table column denoting the member_admin relation/edge.
+	MemberAdminColumn = "admin_team_members"
+	// LeadAdminTable is the table that holds the lead_admin relation/edge.
+	LeadAdminTable = "users"
+	// LeadAdminInverseTable is the table name for the Admin entity.
+	// It exists in this package in order to avoid circular dependency with the "admin" package.
+	LeadAdminInverseTable = "admins"
+	// LeadAdminColumn is the table column denoting the lead_admin relation/edge.
+	LeadAdminColumn = "admin_team_leader"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -22,10 +40,22 @@ var Columns = []string{
 	FieldName,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "users"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"admin_team_members",
+	"admin_team_leader",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}

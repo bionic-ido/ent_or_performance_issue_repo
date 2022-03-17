@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 
+	"entgo.io/bug/ent/admin"
 	"entgo.io/bug/ent/user"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -29,6 +30,44 @@ func (uc *UserCreate) SetAge(i int) *UserCreate {
 func (uc *UserCreate) SetName(s string) *UserCreate {
 	uc.mutation.SetName(s)
 	return uc
+}
+
+// SetMemberAdminID sets the "member_admin" edge to the Admin entity by ID.
+func (uc *UserCreate) SetMemberAdminID(id int) *UserCreate {
+	uc.mutation.SetMemberAdminID(id)
+	return uc
+}
+
+// SetNillableMemberAdminID sets the "member_admin" edge to the Admin entity by ID if the given value is not nil.
+func (uc *UserCreate) SetNillableMemberAdminID(id *int) *UserCreate {
+	if id != nil {
+		uc = uc.SetMemberAdminID(*id)
+	}
+	return uc
+}
+
+// SetMemberAdmin sets the "member_admin" edge to the Admin entity.
+func (uc *UserCreate) SetMemberAdmin(a *Admin) *UserCreate {
+	return uc.SetMemberAdminID(a.ID)
+}
+
+// SetLeadAdminID sets the "lead_admin" edge to the Admin entity by ID.
+func (uc *UserCreate) SetLeadAdminID(id int) *UserCreate {
+	uc.mutation.SetLeadAdminID(id)
+	return uc
+}
+
+// SetNillableLeadAdminID sets the "lead_admin" edge to the Admin entity by ID if the given value is not nil.
+func (uc *UserCreate) SetNillableLeadAdminID(id *int) *UserCreate {
+	if id != nil {
+		uc = uc.SetLeadAdminID(*id)
+	}
+	return uc
+}
+
+// SetLeadAdmin sets the "lead_admin" edge to the Admin entity.
+func (uc *UserCreate) SetLeadAdmin(a *Admin) *UserCreate {
+	return uc.SetLeadAdminID(a.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -149,6 +188,46 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldName,
 		})
 		_node.Name = value
+	}
+	if nodes := uc.mutation.MemberAdminIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.MemberAdminTable,
+			Columns: []string{user.MemberAdminColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: admin.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.admin_team_members = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.LeadAdminIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   user.LeadAdminTable,
+			Columns: []string{user.LeadAdminColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: admin.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.admin_team_leader = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
