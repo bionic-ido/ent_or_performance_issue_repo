@@ -95,6 +95,7 @@ func fillDatabase(client *ent.Client, ctx context.Context) []*ent.Admin {
 }
 
 // Note I only checked this with TestPostgres here since that is what interests me, idk if it is an issue on the others or not.
+// This tests query time of the Or predicate vs query time of doing the same thing as 2 separate queries (applicative union. Union would also have worked to improve the time from manual testing in raw sql in front of postgres). This shows the problem with the Or predicate performance, as we see that 2 separate queries take less than a second, where the Or predicate query takes a long time that only increases the more we insert into the database (as it does a sequential scan)
 func test(t *testing.T, client *ent.Client) {
 	ctx := context.Background()
 
