@@ -47,37 +47,49 @@ func (uu *UserUpdate) SetName(s string) *UserUpdate {
 	return uu
 }
 
-// SetMemberAdminID sets the "member_admin" edge to the Admin entity by ID.
-func (uu *UserUpdate) SetMemberAdminID(id int) *UserUpdate {
-	uu.mutation.SetMemberAdminID(id)
+// SetMemberAdminID sets the "member_admin_id" field.
+func (uu *UserUpdate) SetMemberAdminID(i int) *UserUpdate {
+	uu.mutation.SetMemberAdminID(i)
 	return uu
 }
 
-// SetNillableMemberAdminID sets the "member_admin" edge to the Admin entity by ID if the given value is not nil.
-func (uu *UserUpdate) SetNillableMemberAdminID(id *int) *UserUpdate {
-	if id != nil {
-		uu = uu.SetMemberAdminID(*id)
+// SetNillableMemberAdminID sets the "member_admin_id" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableMemberAdminID(i *int) *UserUpdate {
+	if i != nil {
+		uu.SetMemberAdminID(*i)
 	}
+	return uu
+}
+
+// ClearMemberAdminID clears the value of the "member_admin_id" field.
+func (uu *UserUpdate) ClearMemberAdminID() *UserUpdate {
+	uu.mutation.ClearMemberAdminID()
+	return uu
+}
+
+// SetLeadAdminID sets the "lead_admin_id" field.
+func (uu *UserUpdate) SetLeadAdminID(i int) *UserUpdate {
+	uu.mutation.SetLeadAdminID(i)
+	return uu
+}
+
+// SetNillableLeadAdminID sets the "lead_admin_id" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableLeadAdminID(i *int) *UserUpdate {
+	if i != nil {
+		uu.SetLeadAdminID(*i)
+	}
+	return uu
+}
+
+// ClearLeadAdminID clears the value of the "lead_admin_id" field.
+func (uu *UserUpdate) ClearLeadAdminID() *UserUpdate {
+	uu.mutation.ClearLeadAdminID()
 	return uu
 }
 
 // SetMemberAdmin sets the "member_admin" edge to the Admin entity.
 func (uu *UserUpdate) SetMemberAdmin(a *Admin) *UserUpdate {
 	return uu.SetMemberAdminID(a.ID)
-}
-
-// SetLeadAdminID sets the "lead_admin" edge to the Admin entity by ID.
-func (uu *UserUpdate) SetLeadAdminID(id int) *UserUpdate {
-	uu.mutation.SetLeadAdminID(id)
-	return uu
-}
-
-// SetNillableLeadAdminID sets the "lead_admin" edge to the Admin entity by ID if the given value is not nil.
-func (uu *UserUpdate) SetNillableLeadAdminID(id *int) *UserUpdate {
-	if id != nil {
-		uu = uu.SetLeadAdminID(*id)
-	}
-	return uu
 }
 
 // SetLeadAdmin sets the "lead_admin" edge to the Admin entity.
@@ -303,37 +315,49 @@ func (uuo *UserUpdateOne) SetName(s string) *UserUpdateOne {
 	return uuo
 }
 
-// SetMemberAdminID sets the "member_admin" edge to the Admin entity by ID.
-func (uuo *UserUpdateOne) SetMemberAdminID(id int) *UserUpdateOne {
-	uuo.mutation.SetMemberAdminID(id)
+// SetMemberAdminID sets the "member_admin_id" field.
+func (uuo *UserUpdateOne) SetMemberAdminID(i int) *UserUpdateOne {
+	uuo.mutation.SetMemberAdminID(i)
 	return uuo
 }
 
-// SetNillableMemberAdminID sets the "member_admin" edge to the Admin entity by ID if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableMemberAdminID(id *int) *UserUpdateOne {
-	if id != nil {
-		uuo = uuo.SetMemberAdminID(*id)
+// SetNillableMemberAdminID sets the "member_admin_id" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableMemberAdminID(i *int) *UserUpdateOne {
+	if i != nil {
+		uuo.SetMemberAdminID(*i)
 	}
+	return uuo
+}
+
+// ClearMemberAdminID clears the value of the "member_admin_id" field.
+func (uuo *UserUpdateOne) ClearMemberAdminID() *UserUpdateOne {
+	uuo.mutation.ClearMemberAdminID()
+	return uuo
+}
+
+// SetLeadAdminID sets the "lead_admin_id" field.
+func (uuo *UserUpdateOne) SetLeadAdminID(i int) *UserUpdateOne {
+	uuo.mutation.SetLeadAdminID(i)
+	return uuo
+}
+
+// SetNillableLeadAdminID sets the "lead_admin_id" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableLeadAdminID(i *int) *UserUpdateOne {
+	if i != nil {
+		uuo.SetLeadAdminID(*i)
+	}
+	return uuo
+}
+
+// ClearLeadAdminID clears the value of the "lead_admin_id" field.
+func (uuo *UserUpdateOne) ClearLeadAdminID() *UserUpdateOne {
+	uuo.mutation.ClearLeadAdminID()
 	return uuo
 }
 
 // SetMemberAdmin sets the "member_admin" edge to the Admin entity.
 func (uuo *UserUpdateOne) SetMemberAdmin(a *Admin) *UserUpdateOne {
 	return uuo.SetMemberAdminID(a.ID)
-}
-
-// SetLeadAdminID sets the "lead_admin" edge to the Admin entity by ID.
-func (uuo *UserUpdateOne) SetLeadAdminID(id int) *UserUpdateOne {
-	uuo.mutation.SetLeadAdminID(id)
-	return uuo
-}
-
-// SetNillableLeadAdminID sets the "lead_admin" edge to the Admin entity by ID if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableLeadAdminID(id *int) *UserUpdateOne {
-	if id != nil {
-		uuo = uuo.SetLeadAdminID(*id)
-	}
-	return uuo
 }
 
 // SetLeadAdmin sets the "lead_admin" edge to the Admin entity.

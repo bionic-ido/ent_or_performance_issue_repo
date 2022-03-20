@@ -11,6 +11,10 @@ const (
 	FieldAge = "age"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldMemberAdminID holds the string denoting the member_admin_id field in the database.
+	FieldMemberAdminID = "member_admin_id"
+	// FieldLeadAdminID holds the string denoting the lead_admin_id field in the database.
+	FieldLeadAdminID = "lead_admin_id"
 	// EdgeMemberAdmin holds the string denoting the member_admin edge name in mutations.
 	EdgeMemberAdmin = "member_admin"
 	// EdgeLeadAdmin holds the string denoting the lead_admin edge name in mutations.
@@ -23,14 +27,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
 	MemberAdminInverseTable = "admins"
 	// MemberAdminColumn is the table column denoting the member_admin relation/edge.
-	MemberAdminColumn = "admin_team_members"
+	MemberAdminColumn = "member_admin_id"
 	// LeadAdminTable is the table that holds the lead_admin relation/edge.
 	LeadAdminTable = "users"
 	// LeadAdminInverseTable is the table name for the Admin entity.
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
 	LeadAdminInverseTable = "admins"
 	// LeadAdminColumn is the table column denoting the lead_admin relation/edge.
-	LeadAdminColumn = "admin_team_leader"
+	LeadAdminColumn = "lead_admin_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -38,24 +42,14 @@ var Columns = []string{
 	FieldID,
 	FieldAge,
 	FieldName,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "users"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"admin_team_members",
-	"admin_team_leader",
+	FieldMemberAdminID,
+	FieldLeadAdminID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}

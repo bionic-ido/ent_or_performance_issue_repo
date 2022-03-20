@@ -25,8 +25,8 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "age", Type: field.TypeInt},
 		{Name: "name", Type: field.TypeString},
-		{Name: "admin_team_members", Type: field.TypeInt, Nullable: true},
-		{Name: "admin_team_leader", Type: field.TypeInt, Unique: true, Nullable: true},
+		{Name: "member_admin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "lead_admin_id", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -49,12 +49,12 @@ var (
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "user_admin_team_members",
+				Name:    "user_member_admin_id",
 				Unique:  false,
 				Columns: []*schema.Column{UsersColumns[3]},
 			},
 			{
-				Name:    "user_admin_team_leader",
+				Name:    "user_lead_admin_id",
 				Unique:  false,
 				Columns: []*schema.Column{UsersColumns[4]},
 			},

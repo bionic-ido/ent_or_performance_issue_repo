@@ -20,11 +20,13 @@ type User struct {
 	Age int `json:"age,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// MemberAdminID holds the value of the "member_admin_id" field.
+	MemberAdminID int `json:"member_admin_id,omitempty"`
+	// LeadAdminID holds the value of the "lead_admin_id" field.
+	LeadAdminID int `json:"lead_admin_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
-	Edges              UserEdges `json:"edges"`
-	admin_team_members *int
-	admin_team_leader  *int
+	Edges UserEdges `json:"edges"`
 }
 
 // UserEdges holds the relations/edges for other nodes in the graph.
@@ -71,14 +73,10 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldID, user.FieldAge:
+		case user.FieldID, user.FieldAge, user.FieldMemberAdminID, user.FieldLeadAdminID:
 			values[i] = new(sql.NullInt64)
 		case user.FieldName:
 			values[i] = new(sql.NullString)
-		case user.ForeignKeys[0]: // admin_team_members
-			values[i] = new(sql.NullInt64)
-		case user.ForeignKeys[1]: // admin_team_leader
-			values[i] = new(sql.NullInt64)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type User", columns[i])
 		}
@@ -112,19 +110,17 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				u.Name = value.String
 			}
-		case user.ForeignKeys[0]:
+		case user.FieldMemberAdminID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field admin_team_members", value)
+				return fmt.Errorf("unexpected type %T for field member_admin_id", values[i])
 			} else if value.Valid {
-				u.admin_team_members = new(int)
-				*u.admin_team_members = int(value.Int64)
+				u.MemberAdminID = int(value.Int64)
 			}
-		case user.ForeignKeys[1]:
+		case user.FieldLeadAdminID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field admin_team_leader", value)
+				return fmt.Errorf("unexpected type %T for field lead_admin_id", values[i])
 			} else if value.Valid {
-				u.admin_team_leader = new(int)
-				*u.admin_team_leader = int(value.Int64)
+				u.LeadAdminID = int(value.Int64)
 			}
 		}
 	}
@@ -168,6 +164,10 @@ func (u *User) String() string {
 	builder.WriteString(fmt.Sprintf("%v", u.Age))
 	builder.WriteString(", name=")
 	builder.WriteString(u.Name)
+	builder.WriteString(", member_admin_id=")
+	builder.WriteString(fmt.Sprintf("%v", u.MemberAdminID))
+	builder.WriteString(", lead_admin_id=")
+	builder.WriteString(fmt.Sprintf("%v", u.LeadAdminID))
 	builder.WriteByte(')')
 	return builder.String()
 }

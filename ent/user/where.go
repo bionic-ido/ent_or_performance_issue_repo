@@ -105,6 +105,20 @@ func Name(v string) predicate.User {
 	})
 }
 
+// MemberAdminID applies equality check predicate on the "member_admin_id" field. It's identical to MemberAdminIDEQ.
+func MemberAdminID(v int) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldMemberAdminID), v))
+	})
+}
+
+// LeadAdminID applies equality check predicate on the "lead_admin_id" field. It's identical to LeadAdminIDEQ.
+func LeadAdminID(v int) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldLeadAdminID), v))
+	})
+}
+
 // AgeEQ applies the EQ predicate on the "age" field.
 func AgeEQ(v int) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
@@ -289,6 +303,130 @@ func NameEqualFold(v string) predicate.User {
 func NameContainsFold(v string) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldName), v))
+	})
+}
+
+// MemberAdminIDEQ applies the EQ predicate on the "member_admin_id" field.
+func MemberAdminIDEQ(v int) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldMemberAdminID), v))
+	})
+}
+
+// MemberAdminIDNEQ applies the NEQ predicate on the "member_admin_id" field.
+func MemberAdminIDNEQ(v int) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldMemberAdminID), v))
+	})
+}
+
+// MemberAdminIDIn applies the In predicate on the "member_admin_id" field.
+func MemberAdminIDIn(vs ...int) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldMemberAdminID), v...))
+	})
+}
+
+// MemberAdminIDNotIn applies the NotIn predicate on the "member_admin_id" field.
+func MemberAdminIDNotIn(vs ...int) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldMemberAdminID), v...))
+	})
+}
+
+// MemberAdminIDIsNil applies the IsNil predicate on the "member_admin_id" field.
+func MemberAdminIDIsNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldMemberAdminID)))
+	})
+}
+
+// MemberAdminIDNotNil applies the NotNil predicate on the "member_admin_id" field.
+func MemberAdminIDNotNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldMemberAdminID)))
+	})
+}
+
+// LeadAdminIDEQ applies the EQ predicate on the "lead_admin_id" field.
+func LeadAdminIDEQ(v int) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldLeadAdminID), v))
+	})
+}
+
+// LeadAdminIDNEQ applies the NEQ predicate on the "lead_admin_id" field.
+func LeadAdminIDNEQ(v int) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldLeadAdminID), v))
+	})
+}
+
+// LeadAdminIDIn applies the In predicate on the "lead_admin_id" field.
+func LeadAdminIDIn(vs ...int) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldLeadAdminID), v...))
+	})
+}
+
+// LeadAdminIDNotIn applies the NotIn predicate on the "lead_admin_id" field.
+func LeadAdminIDNotIn(vs ...int) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldLeadAdminID), v...))
+	})
+}
+
+// LeadAdminIDIsNil applies the IsNil predicate on the "lead_admin_id" field.
+func LeadAdminIDIsNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldLeadAdminID)))
+	})
+}
+
+// LeadAdminIDNotNil applies the NotNil predicate on the "lead_admin_id" field.
+func LeadAdminIDNotNil() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldLeadAdminID)))
 	})
 }
 

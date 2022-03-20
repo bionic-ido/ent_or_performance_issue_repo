@@ -790,9 +790,102 @@ func (m *UserMutation) ResetName() {
 	m.name = nil
 }
 
-// SetMemberAdminID sets the "member_admin" edge to the Admin entity by id.
-func (m *UserMutation) SetMemberAdminID(id int) {
-	m.member_admin = &id
+// SetMemberAdminID sets the "member_admin_id" field.
+func (m *UserMutation) SetMemberAdminID(i int) {
+	m.member_admin = &i
+}
+
+// MemberAdminID returns the value of the "member_admin_id" field in the mutation.
+func (m *UserMutation) MemberAdminID() (r int, exists bool) {
+	v := m.member_admin
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMemberAdminID returns the old "member_admin_id" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldMemberAdminID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMemberAdminID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMemberAdminID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMemberAdminID: %w", err)
+	}
+	return oldValue.MemberAdminID, nil
+}
+
+// ClearMemberAdminID clears the value of the "member_admin_id" field.
+func (m *UserMutation) ClearMemberAdminID() {
+	m.member_admin = nil
+	m.clearedFields[user.FieldMemberAdminID] = struct{}{}
+}
+
+// MemberAdminIDCleared returns if the "member_admin_id" field was cleared in this mutation.
+func (m *UserMutation) MemberAdminIDCleared() bool {
+	_, ok := m.clearedFields[user.FieldMemberAdminID]
+	return ok
+}
+
+// ResetMemberAdminID resets all changes to the "member_admin_id" field.
+func (m *UserMutation) ResetMemberAdminID() {
+	m.member_admin = nil
+	delete(m.clearedFields, user.FieldMemberAdminID)
+}
+
+// SetLeadAdminID sets the "lead_admin_id" field.
+func (m *UserMutation) SetLeadAdminID(i int) {
+	m.lead_admin = &i
+}
+
+// LeadAdminID returns the value of the "lead_admin_id" field in the mutation.
+func (m *UserMutation) LeadAdminID() (r int, exists bool) {
+	v := m.lead_admin
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLeadAdminID returns the old "lead_admin_id" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldLeadAdminID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLeadAdminID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLeadAdminID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLeadAdminID: %w", err)
+	}
+	return oldValue.LeadAdminID, nil
+}
+
+// ClearLeadAdminID clears the value of the "lead_admin_id" field.
+func (m *UserMutation) ClearLeadAdminID() {
+	m.lead_admin = nil
+	m.clearedFields[user.FieldLeadAdminID] = struct{}{}
+}
+
+// LeadAdminIDCleared returns if the "lead_admin_id" field was cleared in this mutation.
+func (m *UserMutation) LeadAdminIDCleared() bool {
+	_, ok := m.clearedFields[user.FieldLeadAdminID]
+	return ok
+}
+
+// ResetLeadAdminID resets all changes to the "lead_admin_id" field.
+func (m *UserMutation) ResetLeadAdminID() {
+	m.lead_admin = nil
+	delete(m.clearedFields, user.FieldLeadAdminID)
 }
 
 // ClearMemberAdmin clears the "member_admin" edge to the Admin entity.
@@ -802,15 +895,7 @@ func (m *UserMutation) ClearMemberAdmin() {
 
 // MemberAdminCleared reports if the "member_admin" edge to the Admin entity was cleared.
 func (m *UserMutation) MemberAdminCleared() bool {
-	return m.clearedmember_admin
-}
-
-// MemberAdminID returns the "member_admin" edge ID in the mutation.
-func (m *UserMutation) MemberAdminID() (id int, exists bool) {
-	if m.member_admin != nil {
-		return *m.member_admin, true
-	}
-	return
+	return m.MemberAdminIDCleared() || m.clearedmember_admin
 }
 
 // MemberAdminIDs returns the "member_admin" edge IDs in the mutation.
@@ -829,11 +914,6 @@ func (m *UserMutation) ResetMemberAdmin() {
 	m.clearedmember_admin = false
 }
 
-// SetLeadAdminID sets the "lead_admin" edge to the Admin entity by id.
-func (m *UserMutation) SetLeadAdminID(id int) {
-	m.lead_admin = &id
-}
-
 // ClearLeadAdmin clears the "lead_admin" edge to the Admin entity.
 func (m *UserMutation) ClearLeadAdmin() {
 	m.clearedlead_admin = true
@@ -841,15 +921,7 @@ func (m *UserMutation) ClearLeadAdmin() {
 
 // LeadAdminCleared reports if the "lead_admin" edge to the Admin entity was cleared.
 func (m *UserMutation) LeadAdminCleared() bool {
-	return m.clearedlead_admin
-}
-
-// LeadAdminID returns the "lead_admin" edge ID in the mutation.
-func (m *UserMutation) LeadAdminID() (id int, exists bool) {
-	if m.lead_admin != nil {
-		return *m.lead_admin, true
-	}
-	return
+	return m.LeadAdminIDCleared() || m.clearedlead_admin
 }
 
 // LeadAdminIDs returns the "lead_admin" edge IDs in the mutation.
@@ -887,12 +959,18 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 4)
 	if m.age != nil {
 		fields = append(fields, user.FieldAge)
 	}
 	if m.name != nil {
 		fields = append(fields, user.FieldName)
+	}
+	if m.member_admin != nil {
+		fields = append(fields, user.FieldMemberAdminID)
+	}
+	if m.lead_admin != nil {
+		fields = append(fields, user.FieldLeadAdminID)
 	}
 	return fields
 }
@@ -906,6 +984,10 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Age()
 	case user.FieldName:
 		return m.Name()
+	case user.FieldMemberAdminID:
+		return m.MemberAdminID()
+	case user.FieldLeadAdminID:
+		return m.LeadAdminID()
 	}
 	return nil, false
 }
@@ -919,6 +1001,10 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldAge(ctx)
 	case user.FieldName:
 		return m.OldName(ctx)
+	case user.FieldMemberAdminID:
+		return m.OldMemberAdminID(ctx)
+	case user.FieldLeadAdminID:
+		return m.OldLeadAdminID(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -941,6 +1027,20 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case user.FieldMemberAdminID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMemberAdminID(v)
+		return nil
+	case user.FieldLeadAdminID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLeadAdminID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -986,7 +1086,14 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(user.FieldMemberAdminID) {
+		fields = append(fields, user.FieldMemberAdminID)
+	}
+	if m.FieldCleared(user.FieldLeadAdminID) {
+		fields = append(fields, user.FieldLeadAdminID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -999,6 +1106,14 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
+	switch name {
+	case user.FieldMemberAdminID:
+		m.ClearMemberAdminID()
+		return nil
+	case user.FieldLeadAdminID:
+		m.ClearLeadAdminID()
+		return nil
+	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 
@@ -1011,6 +1126,12 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldName:
 		m.ResetName()
+		return nil
+	case user.FieldMemberAdminID:
+		m.ResetMemberAdminID()
+		return nil
+	case user.FieldLeadAdminID:
+		m.ResetLeadAdminID()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

@@ -25,13 +25,21 @@ func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("age"),
 		field.String("name"),
+		field.Int("member_admin_id").
+			Optional(),
+		field.Int("lead_admin_id").
+			Optional(),
 	}
 }
 
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("member_admin", Admin.Type).Ref("team_members").Unique(),
-		edge.From("lead_admin", Admin.Type).Ref("team_leader").Unique(),
+		edge.From("member_admin", Admin.Type).
+			Field("member_admin_id").
+			Ref("team_members").Unique(),
+		edge.From("lead_admin", Admin.Type).
+			Field("lead_admin_id").
+			Ref("team_leader").Unique(),
 	}
 }

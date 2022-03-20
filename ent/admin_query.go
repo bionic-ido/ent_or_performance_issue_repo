@@ -419,7 +419,6 @@ func (aq *AdminQuery) sqlAll(ctx context.Context) ([]*Admin, error) {
 			nodeids[nodes[i].ID] = nodes[i]
 			nodes[i].Edges.TeamMembers = []*User{}
 		}
-		query.withFKs = true
 		query.Where(predicate.User(func(s *sql.Selector) {
 			s.Where(sql.InValues(admin.TeamMembersColumn, fks...))
 		}))
@@ -428,13 +427,10 @@ func (aq *AdminQuery) sqlAll(ctx context.Context) ([]*Admin, error) {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.admin_team_members
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "admin_team_members" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
+			fk := n.MemberAdminID
+			node, ok := nodeids[fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "admin_team_members" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "member_admin_id" returned %v for node %v`, fk, n.ID)
 			}
 			node.Edges.TeamMembers = append(node.Edges.TeamMembers, n)
 		}
@@ -447,7 +443,6 @@ func (aq *AdminQuery) sqlAll(ctx context.Context) ([]*Admin, error) {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
 		}
-		query.withFKs = true
 		query.Where(predicate.User(func(s *sql.Selector) {
 			s.Where(sql.InValues(admin.TeamLeaderColumn, fks...))
 		}))
@@ -456,13 +451,10 @@ func (aq *AdminQuery) sqlAll(ctx context.Context) ([]*Admin, error) {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.admin_team_leader
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "admin_team_leader" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
+			fk := n.LeadAdminID
+			node, ok := nodeids[fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "admin_team_leader" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "lead_admin_id" returned %v for node %v`, fk, n.ID)
 			}
 			node.Edges.TeamLeader = n
 		}

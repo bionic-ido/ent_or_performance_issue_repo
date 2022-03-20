@@ -5,7 +5,6 @@ import (
 	"entgo.io/bug/ent/admin"
 	"entgo.io/bug/ent/user"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"net"
 	"strconv"
 	"testing"
@@ -128,7 +127,8 @@ func test(t *testing.T, client *ent.Client) {
 
 	end := time.Now().UnixMilli()
 	timeSeconds := float64(end-start) / 1000
-	require.True(t, timeSeconds < 1, "Expected query time to be less then 1 seconds, got %f", timeSeconds)
+	//require.True(t, timeSeconds < 1, "Expected query time to be less then 1 seconds, got %f", timeSeconds)
+	fmt.Printf("Took %f\n", timeSeconds)
 
 	// Test query that has performance issue
 	fmt.Println("Check timing of performance issue query (1 query using Or predicate for member admin & lead admin)")
@@ -136,12 +136,13 @@ func test(t *testing.T, client *ent.Client) {
 
 	for _, dbAdmin := range dbAdmins {
 		client.User.Query().Where(user.Or(
-			user.HasLeadAdminWith(admin.ID(dbAdmin.ID)),
-			user.HasMemberAdminWith(admin.ID(dbAdmin.ID)),
+			user.LeadAdminID(dbAdmin.ID),
+			user.MemberAdminID(dbAdmin.ID),
 		)).AllX(ctx)
 	}
 
 	end = time.Now().UnixMilli()
 	timeSeconds = float64(end-start) / 1000
-	require.True(t, timeSeconds < 1, "Expected query time to be less then 1 seconds, got %f", timeSeconds)
+	//require.True(t, timeSeconds < 1, "Expected query time to be less then 1 seconds, got %f", timeSeconds)
+	fmt.Printf("Took %f\n", timeSeconds)
 }

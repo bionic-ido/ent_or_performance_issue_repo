@@ -28,7 +28,6 @@ type UserQuery struct {
 	// eager-loading edges.
 	withMemberAdmin *AdminQuery
 	withLeadAdmin   *AdminQuery
-	withFKs         bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -385,19 +384,12 @@ func (uq *UserQuery) prepareQuery(ctx context.Context) error {
 func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 	var (
 		nodes       = []*User{}
-		withFKs     = uq.withFKs
 		_spec       = uq.querySpec()
 		loadedTypes = [2]bool{
 			uq.withMemberAdmin != nil,
 			uq.withLeadAdmin != nil,
 		}
 	)
-	if uq.withMemberAdmin != nil || uq.withLeadAdmin != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, user.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &User{config: uq.config}
 		nodes = append(nodes, node)
@@ -422,10 +414,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 		ids := make([]int, 0, len(nodes))
 		nodeids := make(map[int][]*User)
 		for i := range nodes {
-			if nodes[i].admin_team_members == nil {
-				continue
-			}
-			fk := *nodes[i].admin_team_members
+			fk := nodes[i].MemberAdminID
 			if _, ok := nodeids[fk]; !ok {
 				ids = append(ids, fk)
 			}
@@ -439,7 +428,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 		for _, n := range neighbors {
 			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "admin_team_members" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "member_admin_id" returned %v`, n.ID)
 			}
 			for i := range nodes {
 				nodes[i].Edges.MemberAdmin = n
@@ -451,10 +440,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 		ids := make([]int, 0, len(nodes))
 		nodeids := make(map[int][]*User)
 		for i := range nodes {
-			if nodes[i].admin_team_leader == nil {
-				continue
-			}
-			fk := *nodes[i].admin_team_leader
+			fk := nodes[i].LeadAdminID
 			if _, ok := nodeids[fk]; !ok {
 				ids = append(ids, fk)
 			}
@@ -468,7 +454,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 		for _, n := range neighbors {
 			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "admin_team_leader" returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "lead_admin_id" returned %v`, n.ID)
 			}
 			for i := range nodes {
 				nodes[i].Edges.LeadAdmin = n

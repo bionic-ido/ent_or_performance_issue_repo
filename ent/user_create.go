@@ -32,16 +32,30 @@ func (uc *UserCreate) SetName(s string) *UserCreate {
 	return uc
 }
 
-// SetMemberAdminID sets the "member_admin" edge to the Admin entity by ID.
-func (uc *UserCreate) SetMemberAdminID(id int) *UserCreate {
-	uc.mutation.SetMemberAdminID(id)
+// SetMemberAdminID sets the "member_admin_id" field.
+func (uc *UserCreate) SetMemberAdminID(i int) *UserCreate {
+	uc.mutation.SetMemberAdminID(i)
 	return uc
 }
 
-// SetNillableMemberAdminID sets the "member_admin" edge to the Admin entity by ID if the given value is not nil.
-func (uc *UserCreate) SetNillableMemberAdminID(id *int) *UserCreate {
-	if id != nil {
-		uc = uc.SetMemberAdminID(*id)
+// SetNillableMemberAdminID sets the "member_admin_id" field if the given value is not nil.
+func (uc *UserCreate) SetNillableMemberAdminID(i *int) *UserCreate {
+	if i != nil {
+		uc.SetMemberAdminID(*i)
+	}
+	return uc
+}
+
+// SetLeadAdminID sets the "lead_admin_id" field.
+func (uc *UserCreate) SetLeadAdminID(i int) *UserCreate {
+	uc.mutation.SetLeadAdminID(i)
+	return uc
+}
+
+// SetNillableLeadAdminID sets the "lead_admin_id" field if the given value is not nil.
+func (uc *UserCreate) SetNillableLeadAdminID(i *int) *UserCreate {
+	if i != nil {
+		uc.SetLeadAdminID(*i)
 	}
 	return uc
 }
@@ -49,20 +63,6 @@ func (uc *UserCreate) SetNillableMemberAdminID(id *int) *UserCreate {
 // SetMemberAdmin sets the "member_admin" edge to the Admin entity.
 func (uc *UserCreate) SetMemberAdmin(a *Admin) *UserCreate {
 	return uc.SetMemberAdminID(a.ID)
-}
-
-// SetLeadAdminID sets the "lead_admin" edge to the Admin entity by ID.
-func (uc *UserCreate) SetLeadAdminID(id int) *UserCreate {
-	uc.mutation.SetLeadAdminID(id)
-	return uc
-}
-
-// SetNillableLeadAdminID sets the "lead_admin" edge to the Admin entity by ID if the given value is not nil.
-func (uc *UserCreate) SetNillableLeadAdminID(id *int) *UserCreate {
-	if id != nil {
-		uc = uc.SetLeadAdminID(*id)
-	}
-	return uc
 }
 
 // SetLeadAdmin sets the "lead_admin" edge to the Admin entity.
@@ -206,7 +206,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.admin_team_members = &nodes[0]
+		_node.MemberAdminID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := uc.mutation.LeadAdminIDs(); len(nodes) > 0 {
@@ -226,7 +226,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.admin_team_leader = &nodes[0]
+		_node.LeadAdminID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

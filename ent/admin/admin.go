@@ -23,14 +23,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	TeamMembersInverseTable = "users"
 	// TeamMembersColumn is the table column denoting the team_members relation/edge.
-	TeamMembersColumn = "admin_team_members"
+	TeamMembersColumn = "member_admin_id"
 	// TeamLeaderTable is the table that holds the team_leader relation/edge.
 	TeamLeaderTable = "users"
 	// TeamLeaderInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	TeamLeaderInverseTable = "users"
 	// TeamLeaderColumn is the table column denoting the team_leader relation/edge.
-	TeamLeaderColumn = "admin_team_leader"
+	TeamLeaderColumn = "lead_admin_id"
 )
 
 // Columns holds all SQL columns for admin fields.
